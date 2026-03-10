@@ -6,9 +6,6 @@
     "types": [
       "node"
     ],
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": false,
   },
   "include": [
     "vite.config.ts"
