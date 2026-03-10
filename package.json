@@ -1,0 +1,45 @@
+{
+  "name": "lowcode-platform",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "可视化低代码搭建平台",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@lowcode/web",
+    "dev:server": "turbo run dev --filter=@lowcode/server",
+    "build": "turbo run build",
+    "build:shared": "turbo run build --filter=@lowcode/shared",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,vue,js,json,md}\"",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/js": "^9.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-vue": "^10.0.0",
+    "lodash-es": "^4.17.21",
+    "prettier": "^3.4.0",
+    "prettier-plugin-tailwindcss": "^0.7.0",
+    "simple-git-hooks": "^2.11.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "simple-git-hooks": {
+    "commit-msg": "npx --no-install commitlint --edit $1",
+    "pre-commit": "pnpm lint"
+  }
+}
