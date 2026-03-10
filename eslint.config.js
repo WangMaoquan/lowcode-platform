@@ -110,6 +110,7 @@ export default [
     },
     plugins: {
       vue: vuePlugin,
+      '@typescript-eslint': tseslint,
     },
     rules: {
       'vue/multi-word-component-names': 'off',

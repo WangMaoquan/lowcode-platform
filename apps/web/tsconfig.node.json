@@ -1,12 +1,14 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "types": [
       "node"
-    ]
+    ],
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
   },
   "include": [
     "vite.config.ts"

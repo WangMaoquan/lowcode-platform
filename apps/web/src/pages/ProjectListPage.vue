@@ -15,8 +15,9 @@ const handleEditProject = (id: string) => {
   router.push(`/editor/${id}`)
 }
 
-const handleDeleteProject = (_id: string) => {
+const handleDeleteProject = (_id: string): void => {
   // 删除项目逻辑
+  console.log('Delete project:', _id)
 }
 </script>
 
