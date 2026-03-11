@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -13,20 +12,23 @@ const formData = ref({
 })
 
 const loading = ref(false)
+const errorMessage = ref('')
 
 const handleLogin = async () => {
   if (!formData.value.username || !formData.value.password) {
-    ElMessage.warning('请输入用户名和密码')
+    errorMessage.value = '请输入用户名和密码'
     return
   }
 
   loading.value = true
+  errorMessage.value = ''
   try {
     await userStore.login(formData.value)
-    ElMessage.success('登录成功')
+    // 登录成功，跳转到首页
     router.push('/')
   } catch (error: any) {
-    ElMessage.error(error.message || '登录失败')
+    errorMessage.value = error.message || '登录失败'
+    alert(errorMessage.value)
   } finally {
     loading.value = false
   }

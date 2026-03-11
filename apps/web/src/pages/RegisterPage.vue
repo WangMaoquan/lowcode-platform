@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -16,19 +15,21 @@ const formData = ref({
 })
 
 const loading = ref(false)
+const errorMessage = ref('')
 
 const handleRegister = async () => {
   if (!formData.value.username || !formData.value.password) {
-    ElMessage.warning('请输入用户名和密码')
+    errorMessage.value = '请输入用户名和密码'
     return
   }
 
   if (formData.value.password !== formData.value.confirmPassword) {
-    ElMessage.warning('两次输入的密码不一致')
+    errorMessage.value = '两次输入的密码不一致'
     return
   }
 
   loading.value = true
+  errorMessage.value = ''
   try {
     await userStore.register({
       username: formData.value.username,
@@ -36,10 +37,10 @@ const handleRegister = async () => {
       nickname: formData.value.nickname,
       email: formData.value.email,
     })
-    ElMessage.success('注册成功')
     router.push('/')
   } catch (error: any) {
-    ElMessage.error(error.message || '注册失败')
+    errorMessage.value = error.message || '注册失败'
+    alert(errorMessage.value)
   } finally {
     loading.value = false
   }
