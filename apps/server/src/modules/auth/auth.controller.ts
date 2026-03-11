@@ -19,8 +19,9 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(AuthGuard)
   async logout(@Request() _req: Request) {
+    // Logout is handled client-side by removing the token
+    // Server-side just returns success message (stateless logout)
     return { message: '退出成功' }
   }
 }
