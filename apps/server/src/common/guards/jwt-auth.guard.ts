@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { Observable } from 'rxjs'
 
 interface JwtUserData {
@@ -32,7 +32,6 @@ export class AuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest()
-    const response: Response = context.switchToHttp().getResponse()
 
     const requireLogin = this.reflector.getAllAndOverride('require-login', [
       context.getClass(),
@@ -59,19 +58,12 @@ export class AuthGuard implements CanActivate {
         userId,
         username: data.username,
       }
-
-      response.header(
-        'token',
-        this.jwtService.sign(
-          {
-            sub: userId,
-            username: data.username,
-          },
-          {
-            expiresIn: '7d',
-          }
-        )
-      )
+      
+      // 移除了自动token刷新逻辑
+      // 原因：每次请求都设置新token会导致客户端token混乱和安全风险
+      // 建议：客户端应检测token过期并主动调用刷新接口
+      // TODO: 未来可以实现标准的access token + refresh token机制
+      
       return true
     } catch {
       throw new UnauthorizedException('token 失效，请重新登录')
