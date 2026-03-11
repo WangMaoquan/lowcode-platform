@@ -1,10 +1,32 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
 import { UpdateUserDto } from './dto/update-user.dto'
+import logger from '../../utils/logger'
+import { DataValidator } from '../../utils/data-validator'
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * 记录错误日志并区分错误类型
+   */
+  private logError(error: any, context: string, isOperational: boolean = true) {
+    const logData = {
+      context,
+      timestamp: new Date().toISOString(),
+      stack: error.stack,
+      isOperational,
+    }
+    
+    if (isOperational) {
+      // 操作性错误（预期内的业务错误）
+      logger.warn(`${context}: ${error.message}`, logData)
+    } else {
+      // 系统性错误（需要关注的bug）
+      logger.error(`${context}: ${error.message}`, logData)
+    }
+  }
 
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } })
@@ -26,65 +48,80 @@ export class UserService {
     // 获取当前用户信息
     const currentUser = await this.findById(id)
 
-    // 检查用户名是否已存在（忽略空字符串和未变更的值）
+    // 使用统一的数据验证器预处理数据
+    let processedData: Partial<UpdateUserDto>
+    try {
+      processedData = DataValidator.standardizeUpdateUserData(data)
+    } catch (error) {
+      this.logError(error, `Data validation failed for user ${id}`, true)
+      throw new ConflictException('数据格式验证失败')
+    }
+
+    // 检查用户名是否已存在（使用标准化后的数据）
     if (
-      data.username !== undefined &&
-      data.username !== null &&
-      data.username.trim() !== '' &&
-      data.username.trim() !== currentUser.username
+      processedData.username !== undefined &&
+      processedData.username !== null &&
+      processedData.username !== currentUser.username
     ) {
-      const existingUser = await this.findByUsername(data.username.trim())
+      const existingUser = await this.findByUsername(processedData.username)
       if (existingUser && existingUser.id !== id) {
         throw new ConflictException('用户名已被使用')
       }
     }
 
-    // 检查邮箱是否已存在（忽略空字符串和未变更的值）
+    // 检查邮箱是否已存在（使用标准化后的数据）
     if (
-      data.email !== undefined &&
-      data.email !== null &&
-      data.email.trim() !== '' &&
-      data.email.trim() !== currentUser.email
+      processedData.email !== undefined &&
+      processedData.email !== null &&
+      processedData.email !== currentUser.email
     ) {
-      const existingUser = await this.findByEmail(data.email.trim())
+      const existingUser = await this.findByEmail(processedData.email)
       if (existingUser && existingUser.id !== id) {
         throw new ConflictException('邮箱已被使用')
       }
     }
 
-    // 清理数据
-    const cleanData: Partial<UpdateUserDto> = { ...data }
-    if (data.username !== undefined) {
-      cleanData.username = data.username.trim() || null
-    }
-    if (data.email !== undefined) {
-      cleanData.email = data.email.trim() || null
-    }
+    logger.debug(`Updating user ${id} with validated data:`, { 
+      fields: Object.keys(processedData),
+      userId: id 
+    })
 
     return this.prisma.user.update({
       where: { id },
-      data: cleanData,
+      data: processedData,
     })
   }
 
   async getUserStats(userId: string) {
     try {
-      const [projectCount, templateCount] = await this.prisma.$transaction([
-        this.prisma.project.count({ where: { userId } }),
-        // Template 模型暂无用户关联，返回所有模板计数
-        this.prisma.template.count({ where: {} }),
-      ])
+      // Template 模型暂无用户关联，暂时不统计模板数量
+      // TODO: 未来可以在 Template 模型中添加 userId 字段，实现用户模板统计
+      // 当前只返回项目统计，模板统计设为 null 表示暂不可用
+      const projectCount = await this.prisma.project.count({ where: { userId } })
 
+      logger.debug(`Successfully retrieved user stats for user ${userId}: ${projectCount} projects`)
+      
       return {
         projectCount,
-        templateCount,
+        templateCount: null, // 暂不可用，等待 Template 模型添加用户关联
       }
     } catch (error) {
-      // 记录错误并返回默认值
-      console.error('Failed to get user stats:', error)
-      return {
-        projectCount: 0,
-        templateCount: 0,
+      this.logError(error, `getUserStats for user ${userId}`, false) // 系统性错误
+      
+      // 发生异常时也返回有意义的部分数据，而不是全部归零
+      try {
+        const projectCount = await this.prisma.project.count({ where: { userId } })
+        logger.info(`Partial success retrieving project stats for user ${userId} after error`)
+        return {
+          projectCount,
+          templateCount: null,
+        }
+      } catch (fallbackError) {
+        this.logError(fallbackError, `getUserStats fallback for user ${userId}`, true) // 操作性错误
+        return {
+          projectCount: 0,
+          templateCount: null,
+        }
       }
     }
   }
