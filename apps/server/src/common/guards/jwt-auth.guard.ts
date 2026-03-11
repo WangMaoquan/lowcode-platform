@@ -1,21 +1,80 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { JwtService } from '@nestjs/jwt'
+import { Request, Response } from 'express'
+import { Observable } from 'rxjs'
+
+interface JwtUserData {
+  sub?: string
+  userId?: string
+  username: string
+}
+
+declare module 'express' {
+  interface Request {
+    user: JwtUserData
+  }
+}
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-  canActivate(context: ExecutionContext) {
-    return super.canActivate(context)
-  }
+export class AuthGuard implements CanActivate {
+  @Inject()
+  private reflector: Reflector
 
-  handleRequest(
-    err: Error | null,
-    user: unknown,
-    _info: Error | null,
-    _context: ExecutionContext
-  ): unknown {
-    if (err || !user) {
-      throw err || new UnauthorizedException('访问令牌无效或已过期')
+  @Inject(JwtService)
+  private jwtService: JwtService
+
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    const request: Request = context.switchToHttp().getRequest()
+    const response: Response = context.switchToHttp().getResponse()
+
+    const requireLogin = this.reflector.getAllAndOverride('require-login', [
+      context.getClass(),
+      context.getHandler(),
+    ])
+
+    if (!requireLogin) {
+      return true
     }
-    return user
+
+    const authorization = request.headers.authorization
+
+    if (!authorization) {
+      throw new UnauthorizedException('用户未登录')
+    }
+
+    try {
+      const token = authorization.split(' ')[1]
+      const data = this.jwtService.verify<JwtUserData>(token)
+
+      const userId = data.sub || data.userId
+
+      request.user = {
+        userId,
+        username: data.username,
+      }
+
+      response.header(
+        'token',
+        this.jwtService.sign(
+          {
+            sub: userId,
+            username: data.username,
+          },
+          {
+            expiresIn: '7d',
+          }
+        )
+      )
+      return true
+    } catch (e) {
+      throw new UnauthorizedException('token 失效，请重新登录')
+    }
   }
 }

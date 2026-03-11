@@ -71,7 +71,8 @@ export class UserService {
     try {
       const [projectCount, templateCount] = await this.prisma.$transaction([
         this.prisma.project.count({ where: { userId } }),
-        this.prisma.template.count({ where: { authorId: userId } }),
+        // Template 模型暂无用户关联，返回所有模板计数
+        this.prisma.template.count({ where: {} }),
       ])
 
       return {

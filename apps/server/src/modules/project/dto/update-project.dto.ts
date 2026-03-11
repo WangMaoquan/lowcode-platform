@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsObject } from 'class-validator'
+import type { InputJsonValue } from '@prisma/client/runtime/library'
 
 export class UpdateProjectDto {
   @IsOptional()
@@ -11,5 +12,5 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsObject()
-  schema?: Record<string, unknown>
+  schema?: InputJsonValue
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
+import type { InputJsonValue } from '@prisma/client/runtime/library'
 
 @Injectable()
 export class ProjectService {
@@ -24,11 +25,13 @@ export class ProjectService {
 
   async create(
     userId: string,
-    data: { name: string; description?: string; schema?: Record<string, unknown> }
+    data: { name: string; description?: string; schema?: InputJsonValue }
   ) {
     return this.prisma.project.create({
       data: {
-        ...data,
+        name: data.name,
+        description: data.description,
+        schema: data.schema ?? {},
         userId,
       },
     })
@@ -37,7 +40,7 @@ export class ProjectService {
   async update(
     id: string,
     userId: string,
-    data: { name?: string; description?: string; schema?: Record<string, unknown> }
+    data: { name?: string; description?: string; schema?: InputJsonValue }
   ) {
     await this.findById(id, userId)
     return this.prisma.project.update({
