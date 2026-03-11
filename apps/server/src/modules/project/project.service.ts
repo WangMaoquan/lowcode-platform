@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { PrismaService } from '../../prisma/prisma.service'
 
 @Injectable()
 export class ProjectService {
@@ -9,38 +9,45 @@ export class ProjectService {
     return this.prisma.project.findMany({
       where: { userId },
       orderBy: { updatedAt: 'desc' },
-    });
+    })
   }
 
   async findById(id: string, userId: string) {
     const project = await this.prisma.project.findFirst({
       where: { id, userId },
-    });
+    })
     if (!project) {
-      throw new NotFoundException('项目不存在');
+      throw new NotFoundException('项目不存在')
     }
-    return project;
+    return project
   }
 
-  async create(userId: string, data: { name: string; description?: string; schema?: any }) {
+  async create(
+    userId: string,
+    data: { name: string; description?: string; schema?: Record<string, unknown> }
+  ) {
     return this.prisma.project.create({
       data: {
         ...data,
         userId,
       },
-    });
+    })
   }
 
-  async update(id: string, userId: string, data: { name?: string; description?: string; schema?: any }) {
-    await this.findById(id, userId);
+  async update(
+    id: string,
+    userId: string,
+    data: { name?: string; description?: string; schema?: Record<string, unknown> }
+  ) {
+    await this.findById(id, userId)
     return this.prisma.project.update({
       where: { id },
       data,
-    });
+    })
   }
 
   async delete(id: string, userId: string) {
-    await this.findById(id, userId);
-    return this.prisma.project.delete({ where: { id } });
+    await this.findById(id, userId)
+    return this.prisma.project.delete({ where: { id } })
   }
 }

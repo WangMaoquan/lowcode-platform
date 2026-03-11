@@ -20,7 +20,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  async logout(@Request() _req: any) {
+  async logout(@Request() _req: Request) {
     return { message: '退出成功' }
   }
 }
