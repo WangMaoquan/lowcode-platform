@@ -45,8 +45,9 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('user', JSON.stringify(data.user))
 
       return data
-    } catch (error: any) {
-      throw new Error(error.message || '登录失败')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '登录失败'
+      throw new Error(errorMessage)
     } finally {
       loading.value = false
     }
@@ -76,8 +77,9 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('user', JSON.stringify(data.user))
 
       return data
-    } catch (error: any) {
-      throw new Error(error.message || '注册失败')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '注册失败'
+      throw new Error(errorMessage)
     } finally {
       loading.value = false
     }

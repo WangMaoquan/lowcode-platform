@@ -18,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }> {
     const result = await this.authService.login({ username, password })
     if (!result) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('用户名或密码错误')
     }
     return result
   }
