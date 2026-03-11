@@ -53,7 +53,7 @@ export class UserService {
     }
 
     // 清理数据
-    const cleanData: any = { ...data }
+    const cleanData: Partial<UpdateUserDto> = { ...data }
     if (data.username !== undefined) {
       cleanData.username = data.username.trim() || null
     }
