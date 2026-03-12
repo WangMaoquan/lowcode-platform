@@ -77,11 +77,7 @@ const handleClick = (e: MouseEvent) => {
 <style scoped>
 .text-component {
   display: inline-block;
-  cursor: default;
-  transition: color 0.2s ease;
-}
-
-.text-component:hover {
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 </style>

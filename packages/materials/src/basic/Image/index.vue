@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   /** 图片地址 */
@@ -16,8 +16,6 @@ const props = withDefaults(defineProps<{
   radius?: string
   /** 懒加载 */
   lazy?: boolean
-  /** 是否可预览 */
-  preview?: boolean
   /** 加载中占位图 */
   placeholder?: string
   /** 错误占位图 */
@@ -26,13 +24,12 @@ const props = withDefaults(defineProps<{
   draggable?: boolean
 }>(), {
   src: '',
-  alt: '',
+  alt: '图片',
   width: '200px',
   height: '150px',
   fit: 'cover',
   radius: '0px',
   lazy: false,
-  preview: false,
   placeholder: '',
   error: '',
   draggable: true,
@@ -47,15 +44,26 @@ const emit = defineEmits<{
 const isLoading = ref(true)
 const isError = ref(false)
 
+// 监听 src 变化时重置状态
+watch(() => props.src, () => {
+  isLoading.value = true
+  isError.value = false
+})
+
 const showPlaceholder = computed(() => isLoading.value && props.placeholder)
 const showError = computed(() => isError.value && props.error)
 const showImage = computed(() => !isError.value && props.src)
 
-const styleObj = computed(() => ({
+// 容器样式
+const containerStyle = computed(() => ({
   width: props.width,
   height: props.height,
-  'object-fit': props.fit,
   'border-radius': props.radius,
+}))
+
+// 图片样式 - object-fit 必须应用在 img 元素上
+const imgStyle = computed(() => ({
+  'object-fit': props.fit,
 }))
 
 const handleClick = (e: MouseEvent) => {
@@ -78,7 +86,7 @@ const handleError = (e: Event) => {
 <template>
   <div
     class="image-container"
-    :style="styleObj"
+    :style="containerStyle"
     @click="handleClick"
   >
     <!-- 加载中占位图 -->
@@ -103,6 +111,7 @@ const handleError = (e: Event) => {
       :draggable="draggable"
       :loading="lazy ? 'lazy' : 'eager'"
       class="image-main"
+      :style="imgStyle"
       @load="handleLoad"
       @error="handleError"
     >
