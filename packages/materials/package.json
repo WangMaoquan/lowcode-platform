@@ -9,8 +9,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@lowcode/shared": "workspace:*",
-    "vue": "^3.5.0"
+    "@lowcode/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "echarts": "^5.5.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

@@ -1,4 +1,4 @@
-import type { PageSchema, ComponentInstance } from '@lowcode/shared/types'
+import type { PageSchema, ComponentInstance } from '@lowcode/shared'
 
 /**
  * 代码生成器主类

@@ -1,4 +1,4 @@
-import type { ComponentDefinition, PropSchema } from '@lowcode/shared/types'
+import type { ComponentDefinition, PropSchema } from '@lowcode/shared'
 
 export const buttonProps: Record<string, PropSchema> = {
   text: {
