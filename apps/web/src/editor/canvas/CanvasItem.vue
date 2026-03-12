@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useEditorStore } from '@/stores/editor'
+import { getComponentAsync } from '@lowcode/materials'
 import type { ComponentInstance } from '@lowcode/shared/types'
 
 const props = defineProps<{
@@ -8,6 +10,11 @@ const props = defineProps<{
 }>()
 
 const editorStore = useEditorStore()
+
+// 获取实际渲染的 Vue 组件
+const RenderComponent = computed(() => {
+  return getComponentAsync(props.component.name)
+})
 
 const handleClick = (e: Event) => {
   e.stopPropagation()
@@ -23,6 +30,13 @@ const handleClick = (e: Event) => {
     "
     @click="handleClick"
   >
-    <div class="text-sm text-gray-500">[{{ component.label }}]</div>
+    <!-- 动态渲染组件 -->
+    <component
+      v-if="RenderComponent"
+      :is="RenderComponent"
+      v-bind="component.props"
+    />
+    <!-- 回退：显示组件名称 -->
+    <div v-else class="text-sm text-gray-500">[{{ component.label }}]</div>
   </div>
 </template>
