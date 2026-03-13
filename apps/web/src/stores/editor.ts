@@ -58,6 +58,24 @@ function findAndRemoveComponent(
   return false
 }
 
+// 生成新的 UUID
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0
+    const v = c == 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+// 递归深拷贝组件并生成新 ID
+function cloneComponentWithNewId(component: ComponentInstance): ComponentInstance {
+  const cloned = { ...component, id: generateUUID() }
+  if (cloned.children && cloned.children.length > 0) {
+    cloned.children = cloned.children.map(child => cloneComponentWithNewId(child))
+  }
+  return cloned
+}
+
 export const useEditorStore = defineStore('editor', () => {
   // 页面数据
   const page = ref<PageSchema>({
@@ -114,6 +132,44 @@ export const useEditorStore = defineStore('editor', () => {
     page.value.components = newComponents
   }
 
+  // 复制组件到剪贴板
+  function copyComponent() {
+    if (!selectedId.value) return
+    const component = findComponent(page.value.components, selectedId.value)
+    if (component) {
+      clipboard.value = JSON.parse(JSON.stringify(component))
+    }
+  }
+
+  // 粘贴组件
+  function pasteComponent(targetParentId?: string) {
+    if (!clipboard.value) return
+    saveHistory()
+
+    const clonedComponent = cloneComponentWithNewId(clipboard.value)
+
+    if (targetParentId) {
+      // 粘贴到指定容器中
+      const parent = findComponent(page.value.components, targetParentId)
+      if (parent && parent.children) {
+        parent.children.push(clonedComponent)
+      }
+    } else {
+      // 粘贴到根级别
+      page.value.components.push(clonedComponent)
+    }
+
+    // 选中新粘贴的组件
+    selectedId.value = clonedComponent.id
+  }
+
+  // 剪切组件
+  function cutComponent() {
+    if (!selectedId.value) return
+    copyComponent()
+    removeComponent(selectedId.value)
+  }
+
   function saveHistory() {
     // 截断当前索引之后的历史
     history.value = history.value.slice(0, historyIndex.value + 1)
@@ -168,6 +224,9 @@ export const useEditorStore = defineStore('editor', () => {
     updateComponent,
     removeComponent,
     reorderComponents,
+    copyComponent,
+    pasteComponent,
+    cutComponent,
     undo,
     redo,
     setPage,
