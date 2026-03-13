@@ -2,10 +2,9 @@
 import { computed, ref } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { getComponentAsync, useMaterials } from '@lowcode/materials'
-import { VueDraggable } from 'vue-draggable-plus'
 import ContextMenu from '../context-menu/ContextMenu.vue'
 import type { MenuItem } from '../context-menu/ContextMenu.vue'
-import CanvasItem from './CanvasItem.vue'
+import ContainerChildren from './ContainerChildren.vue'
 import type { ComponentInstance } from '@lowcode/shared/types'
 
 const props = defineProps<{
@@ -47,14 +46,6 @@ const componentStyle = computed(() => {
   }
 
   return styleObj
-})
-
-// 子组件列表（容器专用）
-const childrenComponents = computed({
-  get: () => props.component.children || [],
-  set: (value: ComponentInstance[]) => {
-    editorStore.updateComponent(props.component.id, { children: value })
-  },
 })
 
 const handleClick = (e: Event) => {
@@ -215,28 +206,7 @@ const menuItems = computed<MenuItem[]>(() => [
       @dragover="handleContainerDragOver"
       @drop="handleContainerDrop"
     >
-      <!-- 子组件列表 -->
-      <VueDraggable
-        v-if="childrenComponents.length > 0"
-        v-model="childrenComponents"
-        :animation="150"
-        handle=".drag-handle"
-        ghost-class="opacity-50"
-        group="components"
-        class="space-y-2"
-      >
-        <CanvasItem
-          v-for="child in childrenComponents"
-          :key="child.id"
-          :component="child"
-          :selected="editorStore.selectedId === child.id"
-        />
-      </VueDraggable>
-
-      <!-- 空容器提示 -->
-      <div v-else class="flex h-12 items-center justify-center text-sm text-gray-400">
-        拖拽组件到此处
-      </div>
+      <ContainerChildren :component="component" />
     </div>
 
     <!-- 非容器组件：直接渲染 -->
