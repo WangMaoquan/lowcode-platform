@@ -98,11 +98,10 @@ function generateUUID(): string {
     ]"
     @click="handleClick"
   >
-    <!-- 拖拽手柄 -->
-    <!-- 容器组件的手柄在左上角，子组件的手柄在右上角避免重叠 -->
+    <!-- 拖拽手柄：只在选中时显示 -->
     <div
-      class="drag-handle absolute cursor-move px-1 py-0.5 rounded bg-gray-100 hover:bg-gray-200 z-10"
-      :class="isContainer ? 'left-0 top-0' : 'right-0 top-0'"
+      class="drag-handle absolute left-0 top-0 cursor-move px-1 py-0.5 rounded bg-gray-100 hover:bg-gray-200 z-10 transition-opacity"
+      :class="selected ? 'opacity-100' : 'opacity-0 pointer-events-none'"
       title="拖拽排序"
     >
       <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
