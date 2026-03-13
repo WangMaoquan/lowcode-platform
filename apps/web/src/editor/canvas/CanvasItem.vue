@@ -69,7 +69,7 @@ const handleContainerDrop = (e: DragEvent) => {
   try {
     const data = e.dataTransfer?.getData('application/json')
     // 如果没有数据（VueDraggable 内部排序），直接返回
-    if (!data) return
+    if (!data || typeof data !== 'string') return
 
     const dragData = JSON.parse(data)
 
