@@ -62,6 +62,14 @@ const handleClick = (e: Event) => {
   editorStore.selectComponent(props.component.id)
 }
 
+// 处理画布组件拖拽开始
+const handleComponentDragStart = (e: DragEvent) => {
+  e.dataTransfer?.setData('application/json', JSON.stringify({
+    type: 'move', // 移动现有组件
+    id: props.component.id,
+  }))
+}
+
 // 处理容器内的拖拽放置
 const handleContainerDrop = (e: DragEvent) => {
   e.preventDefault()
@@ -72,28 +80,47 @@ const handleContainerDrop = (e: DragEvent) => {
     if (!data) return
 
     const dragData = JSON.parse(data)
-    const componentName = dragData.name
 
-    const componentDef = getComponentDefinition(componentName)
-    if (!componentDef) {
-      console.warn(`未知的组件类型: ${componentName}`)
+    // 如果是移动现有组件
+    if (dragData.type === 'move') {
+      const sourceId = dragData.id
+      // 获取源组件
+      const sourceComponent = editorStore.page.components.find(c => c.id === sourceId)
+      if (sourceComponent) {
+        // 从原位置删除
+        editorStore.removeComponent(sourceId)
+        // 添加到容器
+        const newChildren = [...(props.component.children || []), sourceComponent]
+        editorStore.updateComponent(props.component.id, { children: newChildren })
+      }
       return
     }
 
-    // 创建组件实例
-    const componentInstance: ComponentInstance = {
-      id: generateUUID(),
-      name: componentDef.name,
-      label: componentDef.label,
-      props: { ...componentDef.defaultProps },
-      styles: { ...componentDef.defaultStyles },
-      events: {},
-      children: [],
-    }
+    // 如果是新建组件
+    if (dragData.type === 'new') {
+      const componentName = dragData.name
 
-    // 添加到容器的 children
-    const newChildren = [...(props.component.children || []), componentInstance]
-    editorStore.updateComponent(props.component.id, { children: newChildren })
+      const componentDef = getComponentDefinition(componentName)
+      if (!componentDef) {
+        console.warn(`未知的组件类型: ${componentName}`)
+        return
+      }
+
+      // 创建组件实例
+      const componentInstance: ComponentInstance = {
+        id: generateUUID(),
+        name: componentDef.name,
+        label: componentDef.label,
+        props: { ...componentDef.defaultProps },
+        styles: { ...componentDef.defaultStyles },
+        events: {},
+        children: [],
+      }
+
+      // 添加到容器的 children
+      const newChildren = [...(props.component.children || []), componentInstance]
+      editorStore.updateComponent(props.component.id, { children: newChildren })
+    }
   } catch (error) {
     console.error('处理容器内拖拽放置失败:', error)
   }
@@ -157,7 +184,9 @@ const menuItems = computed<MenuItem[]>(() => [
       isContainer ? 'min-h-[80px]' : ''
     ]"
     :style="componentStyle"
+    draggable="true"
     @click="handleClick"
+    @dragstart="handleComponentDragStart"
     @contextmenu="handleContextMenu"
   >
     <!-- 右键菜单 -->
