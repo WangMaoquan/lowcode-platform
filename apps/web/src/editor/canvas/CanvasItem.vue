@@ -76,22 +76,8 @@ const handleContainerDrop = (e: DragEvent) => {
     // 验证数据结构
     if (!dragData || !dragData.type) return
 
-    // 如果是移动现有组件
-    if (dragData.type === 'move') {
-      const sourceId = dragData.id
-      // 获取源组件
-      const sourceComponent = editorStore.page.components.find(c => c.id === sourceId)
-      if (sourceComponent) {
-        // 从原位置删除
-        editorStore.removeComponent(sourceId)
-        // 添加到容器
-        const newChildren = [...(props.component.children || []), sourceComponent]
-        editorStore.updateComponent(props.component.id, { children: newChildren })
-      }
-      return
-    }
-
-    // 如果是新建组件
+    // 只处理从组件树拖入的新建组件
+    // VueDraggable 内部排序不需要额外处理
     if (dragData.type === 'new') {
       const componentName = dragData.name
 
