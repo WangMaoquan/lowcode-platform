@@ -99,8 +99,11 @@ function generateUUID(): string {
     @click="handleClick"
   >
     <!-- 拖拽手柄 -->
-    <div class="drag-handle absolute left-1 top-1 cursor-move opacity-0 hover:opacity-100 z-10">
-      <svg class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+    <div
+      class="drag-handle absolute left-0 top-0 cursor-move px-1 py-0.5 rounded bg-gray-100 hover:bg-gray-200 z-10"
+      title="拖拽排序"
+    >
+      <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
         <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
       </svg>
     </div>
