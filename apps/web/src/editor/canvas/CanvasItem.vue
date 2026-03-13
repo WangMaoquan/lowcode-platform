@@ -122,6 +122,7 @@ function generateUUID(): string {
         :animation="150"
         handle=".drag-handle"
         ghost-class="opacity-50"
+        group="components"
         class="space-y-2"
       >
         <CanvasItem
