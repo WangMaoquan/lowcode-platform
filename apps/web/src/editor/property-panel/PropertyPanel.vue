@@ -7,10 +7,8 @@ import EventProperties from './EventProperties.vue'
 
 const editorStore = useEditorStore()
 
-const selectedComponent = computed(() => {
-  if (!editorStore.selectedId) return null
-  return editorStore.page.components.find(c => c.id === editorStore.selectedId)
-})
+// 使用 store 中已支持递归查找的 selectedComponent
+const selectedComponent = computed(() => editorStore.selectedComponent)
 </script>
 
 <template>
