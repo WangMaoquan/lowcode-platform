@@ -12,6 +12,11 @@ const { getComponentDefinition } = useMaterials()
 const components = computed(() => editorStore.page.components)
 const selectedId = computed(() => editorStore.selectedId)
 
+// 点击画布空白处取消选中
+const handleCanvasClick = () => {
+  editorStore.selectComponent('')
+}
+
 // 双向绑定组件列表
 const componentList = computed({
   get: () => editorStore.page.components,
@@ -80,6 +85,7 @@ function handleDrop(e: DragEvent) {
 <template>
   <div
     class="min-h-full rounded-lg border-2 border-dashed border-gray-300 bg-white p-4"
+    @click="handleCanvasClick"
     @dragover="handleDragOver"
     @drop="handleDrop"
   >
