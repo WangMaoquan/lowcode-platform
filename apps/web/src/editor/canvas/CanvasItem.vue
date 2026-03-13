@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { getComponentAsync, useMaterials } from '@lowcode/materials'
+import { generateUUID } from '@lowcode/shared'
 import ContextMenu from '../context-menu/ContextMenu.vue'
 import type { MenuItem } from '../context-menu/ContextMenu.vue'
 import ContainerChildren from './ContainerChildren.vue'
@@ -124,14 +125,6 @@ const handleContainerDragEnter = (e: DragEvent) => {
 const handleContainerDragLeave = (e: DragEvent) => {
   e.preventDefault()
   isDragOver.value = false
-}
-
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0
-    const v = c == 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }
 
 // 右键菜单

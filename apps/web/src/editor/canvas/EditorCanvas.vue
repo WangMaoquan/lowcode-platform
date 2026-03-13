@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { useMaterials } from '@lowcode/materials'
+import { generateUUID } from '@lowcode/shared'
 import { VueDraggable } from 'vue-draggable-plus'
 import CanvasItem from './CanvasItem.vue'
 import type { ComponentInstance } from '@lowcode/shared/types'
@@ -29,15 +30,6 @@ const componentList = computed({
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
   e.dataTransfer!.dropEffect = 'copy'
-}
-
-// 生成UUID
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0
-    const v = c == 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }
 
 // 处理组件放置
