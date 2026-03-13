@@ -52,4 +52,9 @@ export const LineChartDefinition: ComponentDefinition = {
     areaStyle: false,
     height: '300px',
   },
+  defaultStyles: {
+    display: 'block',
+    width: '100%',
+    height: '300px',
+  },
 }

@@ -83,4 +83,9 @@ export const ImageDefinition: ComponentDefinition = {
     error: '',
     draggable: true,
   },
+  defaultStyles: {
+    display: 'inline-block',
+    width: '200px',
+    height: '150px',
+  },
 }

@@ -63,4 +63,9 @@ export const PieChartDefinition: ComponentDefinition = {
     roseType: 'none',
     height: '300px',
   },
+  defaultStyles: {
+    display: 'block',
+    width: '100%',
+    height: '300px',
+  },
 }

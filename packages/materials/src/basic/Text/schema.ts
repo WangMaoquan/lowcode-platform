@@ -134,4 +134,7 @@ export const TextDefinition: ComponentDefinition = {
     fontFamily: 'inherit',
     italic: false,
   },
+  defaultStyles: {
+    display: 'inline-block',
+  },
 }

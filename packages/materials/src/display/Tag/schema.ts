@@ -52,4 +52,7 @@ export const TagDefinition: ComponentDefinition = {
     closable: false,
     round: false,
   },
+  defaultStyles: {
+    display: 'inline-block',
+  },
 }

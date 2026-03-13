@@ -90,4 +90,8 @@ export const ContainerDefinition: ComponentDefinition = {
     borderRadius: '0px',
     boxShadow: 'none',
   },
+  defaultStyles: {
+    display: 'block',
+    'min-height': '100px',
+  },
 }

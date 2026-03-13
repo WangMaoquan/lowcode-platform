@@ -59,7 +59,7 @@ function handleDrop(e: DragEvent) {
       name: componentDef.name,
       label: componentDef.label,
       props: { ...componentDef.defaultProps },
-      styles: {},
+      styles: { ...componentDef.defaultStyles },
       events: {},
     }
 

@@ -52,4 +52,9 @@ export const BarChartDefinition: ComponentDefinition = {
     stacked: false,
     height: '300px',
   },
+  defaultStyles: {
+    display: 'block',
+    width: '100%',
+    height: '300px',
+  },
 }

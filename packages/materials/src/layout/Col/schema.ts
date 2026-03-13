@@ -83,4 +83,8 @@ export const ColDefinition: ComponentDefinition = {
     borderColor: '#e5e7eb',
     borderRadius: '0px',
   },
+  defaultStyles: {
+    display: 'block',
+    'flex': '1',
+  },
 }

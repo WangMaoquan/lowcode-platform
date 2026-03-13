@@ -45,4 +45,9 @@ export const InputDefinition: ComponentDefinition = {
     clearable: false,
     password: false,
   },
+  defaultStyles: {
+    display: 'block',
+    width: '200px',
+    'min-height': '32px',
+  },
 }

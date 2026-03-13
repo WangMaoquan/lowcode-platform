@@ -97,4 +97,8 @@ export const RowDefinition: ComponentDefinition = {
     borderColor: '#e5e7eb',
     borderRadius: '0px',
   },
+  defaultStyles: {
+    display: 'flex',
+    'flex-direction': 'row',
+  },
 }

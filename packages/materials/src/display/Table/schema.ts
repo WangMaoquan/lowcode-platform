@@ -56,4 +56,9 @@ export const TableDefinition: ComponentDefinition = {
     border: true,
     hover: true,
   },
+  defaultStyles: {
+    display: 'block',
+    width: '100%',
+    'min-width': '400px',
+  },
 }

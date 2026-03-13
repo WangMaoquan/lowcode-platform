@@ -45,4 +45,8 @@ export const CardDefinition: ComponentDefinition = {
     shadow: 'hover',
     width: '300px',
   },
+  defaultStyles: {
+    display: 'block',
+    width: '300px',
+  },
 }

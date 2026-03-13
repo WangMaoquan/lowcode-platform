@@ -54,4 +54,9 @@ export const SelectDefinition: ComponentDefinition = {
       { label: '选项3', value: 'option3' },
     ],
   },
+  defaultStyles: {
+    display: 'block',
+    width: '200px',
+    'min-height': '32px',
+  },
 }
