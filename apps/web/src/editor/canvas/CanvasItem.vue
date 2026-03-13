@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { getComponentAsync, useMaterials } from '@lowcode/materials'
 import { VueDraggable } from 'vue-draggable-plus'
+import ContextMenu from '../context-menu/ContextMenu.vue'
+import type { MenuItem } from '../context-menu/ContextMenu.vue'
 import CanvasItem from './CanvasItem.vue'
 import type { ComponentInstance } from '@lowcode/shared/types'
 
@@ -14,6 +16,11 @@ const props = defineProps<{
 const editorStore = useEditorStore()
 const { getComponentDefinition } = useMaterials()
 
+// 右键菜单状态
+const showContextMenu = ref(false)
+const contextMenuX = ref(0)
+const contextMenuY = ref(0)
+
 // 获取实际渲染的 Vue 组件
 const RenderComponent = computed(() => {
   return getComponentAsync(props.component.name)
@@ -23,6 +30,23 @@ const RenderComponent = computed(() => {
 const isContainer = computed(() => {
   const def = getComponentDefinition(props.component.name)
   return def?.isContainer ?? false
+})
+
+// 组件样式
+const componentStyle = computed(() => {
+  const styles = props.component.styles || {}
+  const styleObj: Record<string, string> = {}
+
+  // 转换样式键为 kebab-case
+  for (const [key, value] of Object.entries(styles)) {
+    if (value !== '' && value !== undefined && value !== null) {
+      // 转换 camelCase 为 kebab-case
+      const kebabKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
+      styleObj[kebabKey] = value
+    }
+  }
+
+  return styleObj
 })
 
 // 子组件列表（容器专用）
@@ -87,6 +111,42 @@ function generateUUID(): string {
     return v.toString(16)
   })
 }
+
+// 右键菜单
+const handleContextMenu = (e: MouseEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+  editorStore.selectComponent(props.component.id)
+  contextMenuX.value = e.clientX
+  contextMenuY.value = e.clientY
+  showContextMenu.value = true
+}
+
+const closeContextMenu = () => {
+  showContextMenu.value = false
+}
+
+// 菜单项
+const menuItems = computed<MenuItem[]>(() => [
+  {
+    label: '复制',
+    action: () => editorStore.copyComponent(),
+  },
+  {
+    label: '粘贴',
+    action: () => editorStore.pasteComponent(props.component.id),
+    disabled: !editorStore.clipboard || !isContainer.value,
+  },
+  {
+    label: '剪切',
+    action: () => editorStore.cutComponent(),
+  },
+  {
+    label: '删除',
+    danger: true,
+    action: () => editorStore.removeComponent(props.component.id),
+  },
+])
 </script>
 
 <template>
@@ -96,8 +156,18 @@ function generateUUID(): string {
       selected ? 'border-indigo-500 bg-indigo-50' : 'border-transparent hover:border-gray-300',
       isContainer ? 'min-h-[80px]' : ''
     ]"
+    :style="componentStyle"
     @click="handleClick"
+    @contextmenu="handleContextMenu"
   >
+    <!-- 右键菜单 -->
+    <ContextMenu
+      v-if="showContextMenu"
+      :x="contextMenuX"
+      :y="contextMenuY"
+      :items="menuItems"
+      @close="closeContextMenu"
+    />
     <!-- 拖拽手柄：只在选中时显示 -->
     <div
       class="drag-handle absolute left-0 top-0 cursor-move px-1 py-0.5 rounded bg-gray-100 hover:bg-gray-200 z-10 transition-opacity"
@@ -146,6 +216,7 @@ function generateUUID(): string {
         v-if="RenderComponent"
         :is="RenderComponent"
         v-bind="component.props"
+        :style="componentStyle"
       />
       <!-- 回退：显示组件名称 -->
       <div v-else class="text-sm text-gray-500">[{{ component.label }}]</div>
