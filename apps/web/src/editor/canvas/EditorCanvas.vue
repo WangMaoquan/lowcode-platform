@@ -41,10 +41,16 @@ function handleDrop(e: DragEvent) {
 
   try {
     const data = e.dataTransfer?.getData('application/json')
+    // 如果没有数据（VueDraggable 内部排序），直接返回
     if (!data) return
 
     const dragData = JSON.parse(data)
+
+    // 验证数据结构
+    if (!dragData || !dragData.type || dragData.type !== 'new') return
+
     const componentName = dragData.name
+    if (!componentName) return
 
     // 从物料库获取组件定义
     const componentDef = getComponentDefinition(componentName)
