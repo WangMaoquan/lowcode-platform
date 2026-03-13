@@ -20,6 +20,9 @@ const showContextMenu = ref(false)
 const contextMenuX = ref(0)
 const contextMenuY = ref(0)
 
+// 容器拖拽状态
+const isDragOver = ref(false)
+
 // 获取实际渲染的 Vue 组件
 const RenderComponent = computed(() => {
   return getComponentAsync(props.component.name)
@@ -110,6 +113,17 @@ const handleContainerDrop = (e: DragEvent) => {
 const handleContainerDragOver = (e: DragEvent) => {
   e.preventDefault()
   e.dataTransfer!.dropEffect = 'copy'
+  isDragOver.value = true
+}
+
+const handleContainerDragEnter = (e: DragEvent) => {
+  e.preventDefault()
+  isDragOver.value = true
+}
+
+const handleContainerDragLeave = (e: DragEvent) => {
+  e.preventDefault()
+  isDragOver.value = false
 }
 
 function generateUUID(): string {
@@ -192,8 +206,13 @@ const menuItems = computed<MenuItem[]>(() => [
     <!-- 容器组件：显示子组件区域 -->
     <div
       v-if="isContainer"
-      class="mt-2 rounded border-2 border-dashed border-gray-200 bg-gray-50 p-2 min-h-[60px]"
+      class="mt-2 rounded border-2 border-dashed p-4 min-h-[100px] transition-all"
+      :class="[
+        isDragOver ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 bg-gray-50'
+      ]"
       @dragover="handleContainerDragOver"
+      @dragenter="handleContainerDragEnter"
+      @dragleave="handleContainerDragLeave"
       @drop="handleContainerDrop"
     >
       <ContainerChildren :component="component" />
