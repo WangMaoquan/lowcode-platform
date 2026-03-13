@@ -82,6 +82,7 @@ export const RowDefinition: ComponentDefinition = {
   name: 'Row',
   label: '行',
   category: 'layout',
+  isContainer: true,
   propsSchema: rowProps,
   defaultProps: {
     gutter: 0,

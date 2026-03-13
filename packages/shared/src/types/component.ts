@@ -35,6 +35,7 @@ export interface ComponentDefinition {
   name: string
   label: string
   category: ComponentCategory
+  isContainer?: boolean  // 是否为容器组件
   propsSchema: Record<string, PropSchema>
   defaultProps: Record<string, any>
 }

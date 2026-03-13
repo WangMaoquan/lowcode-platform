@@ -68,6 +68,7 @@ export const ColDefinition: ComponentDefinition = {
   name: 'Col',
   label: '列',
   category: 'layout',
+  isContainer: true,
   propsSchema: colProps,
   defaultProps: {
     span: 24,

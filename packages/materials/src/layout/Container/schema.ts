@@ -75,6 +75,7 @@ export const ContainerDefinition: ComponentDefinition = {
   name: 'Container',
   label: '容器',
   category: 'layout',
+  isContainer: true,
   propsSchema: containerProps,
   defaultProps: {
     fluid: false,
