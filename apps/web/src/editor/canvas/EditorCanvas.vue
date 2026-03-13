@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { useMaterials } from '@lowcode/materials'
 import { VueDraggable } from 'vue-draggable-plus'
@@ -69,33 +69,6 @@ function handleDrop(e: DragEvent) {
     console.error('处理拖拽放置失败:', error)
   }
 }
-
-// 处理键盘事件
-function handleKeyDown(e: KeyboardEvent) {
-  // 确保不在输入元素中触发
-  const target = e.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-    return
-  }
-
-  // 检测Delete键
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    if (selectedId.value) {
-      e.preventDefault()
-      editorStore.removeComponent(selectedId.value)
-    }
-  }
-}
-
-// 添加键盘事件监听
-onMounted(() => {
-  document.addEventListener('keydown', handleKeyDown)
-})
-
-// 移除键盘事件监听
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeyDown)
-})
 </script>
 
 <template>

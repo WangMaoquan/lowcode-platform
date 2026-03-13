@@ -40,6 +40,11 @@ export function useMaterials() {
     return componentDefinitions.find(d => d.name === name)
   }
 
+  const getComponentPropsSchema = (name: string) => {
+    const def = componentDefinitions.find(d => d.name === name)
+    return def?.propsSchema || {}
+  }
+
   const getComponentsByCategory = (category: string) => {
     return componentDefinitions.filter(d => d.category === category)
   }
@@ -47,6 +52,7 @@ export function useMaterials() {
   return {
     getComponentDefinitions,
     getComponentDefinition,
+    getComponentPropsSchema,
     getComponentsByCategory,
   }
 }
