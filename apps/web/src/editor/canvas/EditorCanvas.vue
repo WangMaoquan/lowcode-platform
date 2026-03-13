@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { useMaterials } from '@lowcode/materials'
+import { VueDraggable } from 'vue-draggable-plus'
 import CanvasItem from './CanvasItem.vue'
 import type { ComponentInstance } from '@lowcode/shared/types'
 
@@ -10,6 +11,14 @@ const { getComponentDefinition } = useMaterials()
 
 const components = computed(() => editorStore.page.components)
 const selectedId = computed(() => editorStore.selectedId)
+
+// 双向绑定组件列表
+const componentList = computed({
+  get: () => editorStore.page.components,
+  set: (value: ComponentInstance[]) => {
+    editorStore.reorderComponents(value)
+  },
+})
 
 // 处理拖拽悬停
 function handleDragOver(e: DragEvent) {
@@ -114,13 +123,20 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-else class="space-y-2">
+    <VueDraggable
+      v-else
+      v-model="componentList"
+      :animation="150"
+      handle=".drag-handle"
+      ghost-class="opacity-50"
+      class="space-y-2"
+    >
       <CanvasItem
-        v-for="component in components"
+        v-for="component in componentList"
         :key="component.id"
         :component="component"
         :selected="selectedId === component.id"
       />
-    </div>
+    </VueDraggable>
   </div>
 </template>

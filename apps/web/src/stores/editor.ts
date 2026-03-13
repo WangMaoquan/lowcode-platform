@@ -2,6 +2,62 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PageSchema, ComponentInstance } from '@lowcode/shared/types'
 
+// 递归查找组件
+function findComponent(
+  components: ComponentInstance[],
+  id: string
+): ComponentInstance | null {
+  for (const component of components) {
+    if (component.id === id) return component
+    if (component.children && component.children.length > 0) {
+      const found = findComponent(component.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+// 递归查找并更新组件
+function findAndUpdateComponent(
+  components: ComponentInstance[],
+  id: string,
+  updates: Partial<ComponentInstance>
+): boolean {
+  for (let i = 0; i < components.length; i++) {
+    if (components[i].id === id) {
+      components[i] = { ...components[i], ...updates }
+      return true
+    }
+    const children = components[i].children
+    if (children && children.length > 0) {
+      if (findAndUpdateComponent(children, id, updates)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+// 递归删除组件
+function findAndRemoveComponent(
+  components: ComponentInstance[],
+  id: string
+): boolean {
+  for (let i = 0; i < components.length; i++) {
+    if (components[i].id === id) {
+      components.splice(i, 1)
+      return true
+    }
+    const children = components[i].children
+    if (children && children.length > 0) {
+      if (findAndRemoveComponent(children, id)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 export const useEditorStore = defineStore('editor', () => {
   // 页面数据
   const page = ref<PageSchema>({
@@ -27,7 +83,7 @@ export const useEditorStore = defineStore('editor', () => {
 
   const selectedComponent = computed(() => {
     if (!selectedId.value) return null
-    return page.value.components.find(c => c.id === selectedId.value)
+    return findComponent(page.value.components, selectedId.value)
   })
 
   // 方法
@@ -41,19 +97,21 @@ export const useEditorStore = defineStore('editor', () => {
   }
 
   function updateComponent(id: string, updates: Partial<ComponentInstance>) {
-    const index = page.value.components.findIndex(c => c.id === id)
-    if (index !== -1) {
-      saveHistory()
-      page.value.components[index] = { ...page.value.components[index], ...updates }
-    }
+    saveHistory()
+    findAndUpdateComponent(page.value.components, id, updates)
   }
 
   function removeComponent(id: string) {
     saveHistory()
-    page.value.components = page.value.components.filter(c => c.id !== id)
+    findAndRemoveComponent(page.value.components, id)
     if (selectedId.value === id) {
       selectedId.value = null
     }
+  }
+
+  function reorderComponents(newComponents: ComponentInstance[]) {
+    saveHistory()
+    page.value.components = newComponents
   }
 
   function saveHistory() {
@@ -109,6 +167,7 @@ export const useEditorStore = defineStore('editor', () => {
     addComponent,
     updateComponent,
     removeComponent,
+    reorderComponents,
     undo,
     redo,
     setPage,
