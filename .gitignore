@@ -60,3 +60,5 @@ apps/server/prisma/*.db-journal
 *.js.map
 *.d.ts
 *.d.ts.map
+
+.playwright-cli
