@@ -37,11 +37,6 @@ export const pieChartProps: Record<string, PropSchema> = {
       { label: '面积', value: 'area' },
     ],
   },
-  height: {
-    type: 'string',
-    label: '图表高度',
-    default: '300px',
-  },
 }
 
 export const PieChartDefinition: ComponentDefinition = {
@@ -61,7 +56,6 @@ export const PieChartDefinition: ComponentDefinition = {
     radius: '50%',
     center: '50%, 50%',
     roseType: 'none',
-    height: '300px',
   },
   defaultStyles: {
     display: 'block',
