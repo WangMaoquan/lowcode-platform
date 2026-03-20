@@ -26,11 +26,6 @@ export const cardProps: Record<string, PropSchema> = {
       { label: '从不显示', value: 'never' },
     ],
   },
-  width: {
-    type: 'string',
-    label: '宽度',
-    default: '300px',
-  },
 }
 
 export const CardDefinition: ComponentDefinition = {
@@ -43,7 +38,6 @@ export const CardDefinition: ComponentDefinition = {
     subTitle: '',
     content: '卡片内容',
     shadow: 'hover',
-    width: '300px',
   },
   defaultStyles: {
     display: 'block',
