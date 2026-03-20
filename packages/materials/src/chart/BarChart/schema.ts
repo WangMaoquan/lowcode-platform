@@ -31,11 +31,6 @@ export const barChartProps: Record<string, PropSchema> = {
     label: '堆叠',
     default: false,
   },
-  height: {
-    type: 'string',
-    label: '图表高度',
-    default: '300px',
-  },
 }
 
 export const BarChartDefinition: ComponentDefinition = {
@@ -50,7 +45,6 @@ export const BarChartDefinition: ComponentDefinition = {
     seriesName: '销量',
     horizontal: false,
     stacked: false,
-    height: '300px',
   },
   defaultStyles: {
     display: 'block',
