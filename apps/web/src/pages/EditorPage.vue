@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useEditorStore } from '@/stores/editor'
 import { useProjectStore } from '@/stores/project'
 import { useMaterials } from '@lowcode/materials'
@@ -10,6 +10,7 @@ import ComponentTree from '@/editor/component-tree/ComponentTree.vue'
 import PropertyPanel from '@/editor/property-panel/PropertyPanel.vue'
 
 const router = useRouter()
+const route = useRoute()
 const editorStore = useEditorStore()
 const projectStore = useProjectStore()
 const { categories } = useMaterials()
@@ -18,6 +19,34 @@ const activeTab = ref('components')
 const searchQuery = ref('')
 const showShortcuts = ref(false)
 const saving = ref(false)
+const loading = ref(false)
+
+// 监听路由参数，加载项目数据
+watch(
+  () => route.params.id,
+  async (newId) => {
+    if (newId) {
+      loading.value = true
+      try {
+        const project = await projectStore.fetchProject(newId as string)
+        if (project?.schema) {
+          editorStore.setPage({
+            id: project.id,
+            name: project.name,
+            components: project.schema.components || [],
+            styles: project.schema.styles || {},
+          })
+          editorStore.setProjectId(project.id)
+        }
+      } catch (error) {
+        console.error('加载项目失败:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+  },
+  { immediate: true }
+)
 
 // 保存项目
 const handleSave = async () => {
