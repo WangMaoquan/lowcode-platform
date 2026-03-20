@@ -44,10 +44,9 @@ let beforeEachCallback: ((to: any, from: any) => any) | null = null
 
 // 导出设置路由守卫的函数
 export const setupRouteGuard = (getEditorStore: () => { hasUnsavedChanges: { value: boolean } } | null) => {
-  // 如果已经有回调，先移除
+  // 移除之前的守卫
   if (beforeEachCallback) {
-    router.beforeEach(beforeEachCallback)
-    beforeEachCallback = null
+    router.beforeEach(() => true)
   }
 
   beforeEachCallback = async (to, from) => {
