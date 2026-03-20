@@ -2,18 +2,55 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEditorStore } from '@/stores/editor'
+import { useProjectStore } from '@/stores/project'
 import { useMaterials } from '@lowcode/materials'
+import { setupRouteGuard } from '@/router'
 import EditorCanvas from '@/editor/canvas/EditorCanvas.vue'
 import ComponentTree from '@/editor/component-tree/ComponentTree.vue'
 import PropertyPanel from '@/editor/property-panel/PropertyPanel.vue'
 
 const router = useRouter()
 const editorStore = useEditorStore()
+const projectStore = useProjectStore()
 const { categories } = useMaterials()
 
 const activeTab = ref('components')
 const searchQuery = ref('')
 const showShortcuts = ref(false)
+const saving = ref(false)
+
+// 保存项目
+const handleSave = async () => {
+  if (saving.value) return
+  saving.value = true
+
+  try {
+    const pageData = {
+      name: editorStore.page.name,
+      components: editorStore.page.components,
+      styles: editorStore.page.styles,
+    }
+
+    if (editorStore.projectId) {
+      // 更新现有项目
+      await projectStore.updateProject(editorStore.projectId, {
+        name: editorStore.page.name,
+        schema: pageData,
+      })
+    } else {
+      // 创建新项目
+      const project = await projectStore.createProject({
+        name: editorStore.page.name,
+        schema: pageData,
+      })
+      editorStore.setProjectId(project.id)
+    }
+  } catch (error) {
+    console.error('保存项目失败:', error)
+  } finally {
+    saving.value = false
+  }
+}
 
 // 键盘快捷键处理
 const handleKeydown = (e: KeyboardEvent) => {
@@ -66,6 +103,8 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  // 设置路由守卫
+  setupRouteGuard(() => editorStore)
 })
 
 onUnmounted(() => {
@@ -136,6 +175,16 @@ onUnmounted(() => {
 
       <!-- Right: Preview & Export -->
       <div class="flex items-center gap-2">
+        <button
+          @click="handleSave"
+          :disabled="saving"
+          class="flex items-center gap-2 px-4 py-2 text-dark-text-secondary hover:text-dark-text transition-colors disabled:opacity-50"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          <span class="text-sm">{{ saving ? '保存中...' : '保存' }}</span>
+        </button>
         <button class="flex items-center gap-2 px-4 py-2 text-dark-text-secondary hover:text-dark-text transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

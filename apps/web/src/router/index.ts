@@ -36,4 +36,44 @@ const router = createRouter({
   ],
 })
 
+// 路由白名单（离开时不需要提示）
+const noPromptRoutes = ['preview']
+
+// 保存 beforeEach 的回调
+let beforeEachCallback: ((to: any, from: any) => any) | null = null
+
+// 导出设置路由守卫的函数
+export const setupRouteGuard = (getEditorStore: () => { hasUnsavedChanges: { value: boolean } } | null) => {
+  // 如果已经有回调，先移除
+  if (beforeEachCallback) {
+    router.beforeEach(beforeEachCallback)
+    beforeEachCallback = null
+  }
+
+  beforeEachCallback = async (to, from) => {
+    const editorStore = getEditorStore?.()
+
+    // 只有从编辑器页面离开时才检查
+    if (from.name === 'editor' && editorStore?.hasUnsavedChanges.value) {
+      // 如果目标是预览页面，不需要提示
+      if (noPromptRoutes.includes(to.name as string)) {
+        return true
+      }
+
+      // 显示确认对话框
+      const confirmed = window.confirm(
+        '您有未保存的更改，确定要离开吗？\n\n点击"确定"将放弃所有未保存的更改。\n点击"取消"留在当前页面。'
+      )
+
+      if (!confirmed) {
+        return false // 取消导航
+      }
+    }
+
+    return true
+  }
+
+  router.beforeEach(beforeEachCallback)
+}
+
 export default router
