@@ -1,4 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { useEditorStore } from './../stores/editor'
+import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,10 +41,15 @@ const router = createRouter({
 const noPromptRoutes = ['preview']
 
 // 保存 beforeEach 的回调
-let beforeEachCallback: ((to: any, from: any) => any) | null = null
+let beforeEachCallback:
+  | ((
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized
+    ) => boolean | void | Promise<boolean>)
+  | null = null
 
 // 导出设置路由守卫的函数
-export const setupRouteGuard = (getEditorStore: () => { hasUnsavedChanges: { value: boolean } } | null) => {
+export const setupRouteGuard = (getEditorStore: () => ReturnType<typeof useEditorStore>) => {
   // 移除之前的守卫
   if (beforeEachCallback) {
     router.beforeEach(() => true)
@@ -53,8 +59,8 @@ export const setupRouteGuard = (getEditorStore: () => { hasUnsavedChanges: { val
     const editorStore = getEditorStore?.()
 
     // 只有从编辑器页面离开时才检查
-    if (from.name === 'editor' && editorStore?.hasUnsavedChanges.value) {
-      // 如果目标是预览页面，不需要提示
+    if (from.name === 'editor' && editorStore?.hasUnsavedChanges) {
+      // 如果目标是预览页面，不需要提示，也不重置
       if (noPromptRoutes.includes(to.name as string)) {
         return true
       }
@@ -66,6 +72,14 @@ export const setupRouteGuard = (getEditorStore: () => { hasUnsavedChanges: { val
 
       if (!confirmed) {
         return false // 取消导航
+      }
+    }
+
+    // 离开编辑器时重置 store
+    if (from.name === 'editor') {
+      const store = getEditorStore?.()
+      if (store) {
+        store.reset()
       }
     }
 
