@@ -31,11 +31,6 @@ export const lineChartProps: Record<string, PropSchema> = {
     label: '面积填充',
     default: false,
   },
-  height: {
-    type: 'string',
-    label: '图表高度',
-    default: '300px',
-  },
 }
 
 export const LineChartDefinition: ComponentDefinition = {
@@ -50,7 +45,6 @@ export const LineChartDefinition: ComponentDefinition = {
     seriesName: '销量',
     smooth: false,
     areaStyle: false,
-    height: '300px',
   },
   defaultStyles: {
     display: 'block',
