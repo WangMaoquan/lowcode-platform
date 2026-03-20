@@ -238,10 +238,8 @@ onUnmounted(() => {
       </aside>
 
       <!-- Canvas Area -->
-      <main class="flex-1 bg-dark-bg overflow-auto p-8">
-        <div class="min-h-full flex items-center justify-center">
-          <EditorCanvas />
-        </div>
+      <main class="flex-1 bg-dark-bg overflow-auto p-4">
+        <EditorCanvas />
       </main>
 
       <!-- Right Sidebar - Properties -->
