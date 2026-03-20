@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useEditorStore } from '@/stores/editor'
 import { useMaterials } from '@lowcode/materials'
 import EditorCanvas from '@/editor/canvas/EditorCanvas.vue'
 import ComponentTree from '@/editor/component-tree/ComponentTree.vue'
 import PropertyPanel from '@/editor/property-panel/PropertyPanel.vue'
 
+const router = useRouter()
 const editorStore = useEditorStore()
 const { categories } = useMaterials()
 
@@ -77,7 +79,7 @@ onUnmounted(() => {
     <header class="h-14 bg-dark-surface border-b border-dark-border flex items-center justify-between px-4 flex-shrink-0">
       <!-- Left: Logo & Project Info -->
       <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 cursor-pointer" @click="router.push('/')">
           <div class="w-8 h-8 bg-dark-accent rounded-lg flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
