@@ -4,10 +4,7 @@ import { generateUUID } from '@lowcode/shared'
 import type { PageSchema, ComponentInstance } from '@lowcode/shared/types'
 
 // 递归查找组件
-function findComponent(
-  components: ComponentInstance[],
-  id: string
-): ComponentInstance | null {
+function findComponent(components: ComponentInstance[], id: string): ComponentInstance | null {
   for (const component of components) {
     if (component.id === id) return component
     if (component.children && component.children.length > 0) {
@@ -40,10 +37,7 @@ function findAndUpdateComponent(
 }
 
 // 递归删除组件
-function findAndRemoveComponent(
-  components: ComponentInstance[],
-  id: string
-): boolean {
+function findAndRemoveComponent(components: ComponentInstance[], id: string): boolean {
   for (let i = 0; i < components.length; i++) {
     if (components[i].id === id) {
       components.splice(i, 1)
@@ -63,7 +57,7 @@ function findAndRemoveComponent(
 function cloneComponentWithNewId(component: ComponentInstance): ComponentInstance {
   const cloned = { ...component, id: generateUUID() }
   if (cloned.children && cloned.children.length > 0) {
-    cloned.children = cloned.children.map(child => cloneComponentWithNewId(child))
+    cloned.children = cloned.children.map((child) => cloneComponentWithNewId(child))
   }
   return cloned
 }
@@ -98,7 +92,7 @@ export const useEditorStore = defineStore('editor', () => {
   const hasUnsavedChanges = computed(() => {
     // 如果有项目ID，说明是从数据库加载的，需要检测变更
     // 简单判断：history 中有记录就算有更改
-    return history.value.length > 1
+    return history.value.length > 0
   })
 
   const selectedComponent = computed(() => {
