@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import BasicProperties from './BasicProperties.vue'
 import StyleProperties from './StyleProperties.vue'
@@ -7,12 +7,19 @@ import EventProperties from './EventProperties.vue'
 
 const editorStore = useEditorStore()
 
-// 使用 store 中已支持递归查找的 selectedComponent
-const selectedComponent = computed(() => editorStore.selectedComponent)
+// Tab 切换状态
+const activeTab = ref<'basic' | 'style' | 'event'>('basic')
+
+// Tab 配置
+const tabs = [
+  { key: 'basic', label: '基础', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z', gradient: 'var(--color-dark-accent)' },
+  { key: 'style', label: '样式', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01', gradient: 'linear-gradient(135deg, #ec4899, #8b5cf6)' },
+  { key: 'event', label: '事件', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', gradient: 'linear-gradient(135deg, #f59e0b, #ef4444)' },
+] as const
 </script>
 
 <template>
-  <div class="p-3">
+  <div class="p-3 h-full flex flex-col">
     <!-- 标题 -->
     <div class="flex items-center gap-2 mb-4 px-2">
       <div
@@ -27,7 +34,8 @@ const selectedComponent = computed(() => editorStore.selectedComponent)
       <h3 class="text-sm font-semibold" style="color: var(--color-dark-text); font-family: var(--font-display);">属性配置</h3>
     </div>
 
-    <div v-if="!selectedComponent" class="flex flex-col items-center justify-center py-12 px-4">
+    <!-- 未选中组件提示 -->
+    <div v-if="!editorStore.selectedComponent" class="flex-1 flex flex-col items-center justify-center py-12 px-4">
       <div
         class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
         style="background-color: var(--color-dark-surface-hover);"
@@ -40,15 +48,39 @@ const selectedComponent = computed(() => editorStore.selectedComponent)
       <p class="text-xs mt-1" style="color: var(--color-dark-text-secondary); opacity: 0.7;">点击画布中的组件进行编辑</p>
     </div>
 
-    <div v-else class="space-y-3">
-      <!-- 基础属性 -->
-      <BasicProperties :component="selectedComponent" />
+    <!-- Tab 内容区域 -->
+    <template v-else>
+      <!-- Tab 切换 -->
+      <div class="flex border-b mb-3" style="border-color: var(--color-dark-border);">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          @click="activeTab = tab.key"
+          class="flex-1 flex flex-col items-center gap-1 py-2 px-1 transition-colors relative"
+          :style="{
+            color: activeTab === tab.key ? 'var(--color-dark-text)' : 'var(--color-dark-text-secondary)'
+          }"
+        >
+          <!-- 激活指示器 -->
+          <div
+            v-if="activeTab === tab.key"
+            class="absolute bottom-0 left-0 right-0 h-0.5"
+            :style="{ background: tab.gradient }"
+          ></div>
 
-      <!-- 样式属性 -->
-      <StyleProperties :component="selectedComponent" />
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="tab.icon" />
+          </svg>
+          <span class="text-xs">{{ tab.label }}</span>
+        </button>
+      </div>
 
-      <!-- 事件属性 -->
-      <EventProperties :component="selectedComponent" />
-    </div>
+      <!-- Tab 内容 -->
+      <div class="flex-1 overflow-y-auto">
+        <BasicProperties v-if="activeTab === 'basic'" :component="editorStore.selectedComponent" />
+        <StyleProperties v-else-if="activeTab === 'style'" :component="editorStore.selectedComponent" />
+        <EventProperties v-else-if="activeTab === 'event'" :component="editorStore.selectedComponent" />
+      </div>
+    </template>
   </div>
 </template>
