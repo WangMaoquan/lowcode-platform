@@ -69,6 +69,9 @@ function cloneComponentWithNewId(component: ComponentInstance): ComponentInstanc
 }
 
 export const useEditorStore = defineStore('editor', () => {
+  // 当前项目ID（用于保存）
+  const projectId = ref<string | null>(null)
+
   // 页面数据
   const page = ref<PageSchema>({
     id: '',
@@ -90,6 +93,13 @@ export const useEditorStore = defineStore('editor', () => {
   // 计算属性
   const canUndo = computed(() => historyIndex.value > 0)
   const canRedo = computed(() => historyIndex.value < history.value.length - 1)
+
+  // 是否有未保存的更改
+  const hasUnsavedChanges = computed(() => {
+    // 如果有项目ID，说明是从数据库加载的，需要检测变更
+    // 简单判断：history 中有记录就算有更改
+    return history.value.length > 1
+  })
 
   const selectedComponent = computed(() => {
     if (!selectedId.value) return null
@@ -196,13 +206,20 @@ export const useEditorStore = defineStore('editor', () => {
       components: [],
       styles: {},
     }
+    projectId.value = null
     selectedId.value = null
     history.value = []
     historyIndex.value = -1
     saveHistory()
   }
 
+  // 设置项目ID
+  function setProjectId(id: string | null) {
+    projectId.value = id
+  }
+
   return {
+    projectId,
     page,
     selectedId,
     history,
@@ -210,6 +227,7 @@ export const useEditorStore = defineStore('editor', () => {
     clipboard,
     canUndo,
     canRedo,
+    hasUnsavedChanges,
     selectedComponent,
     selectComponent,
     addComponent,
@@ -222,6 +240,7 @@ export const useEditorStore = defineStore('editor', () => {
     undo,
     redo,
     setPage,
+    setProjectId,
     reset,
   }
 })
