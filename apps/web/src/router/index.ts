@@ -50,9 +50,9 @@ let beforeEachCallback:
 
 // 导出设置路由守卫的函数
 export const setupRouteGuard = (getEditorStore: () => ReturnType<typeof useEditorStore>) => {
-  // 移除之前的守卫
+  // 如果已经设置过守卫，不再重复设置
   if (beforeEachCallback) {
-    router.beforeEach(() => true)
+    return
   }
 
   beforeEachCallback = async (to, from) => {
