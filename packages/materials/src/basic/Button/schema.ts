@@ -49,11 +49,6 @@ export const buttonProps: Record<string, PropSchema> = {
     label: '加载中',
     default: false,
   },
-  block: {
-    type: 'boolean',
-    label: '块级按钮',
-    default: false,
-  },
   icon: {
     type: 'select',
     label: '左侧图标',
@@ -112,7 +107,6 @@ export const ButtonDefinition: ComponentDefinition = {
     shape: 'default',
     disabled: false,
     loading: false,
-    block: false,
     icon: '',
     iconRight: '',
     htmlType: 'button',
