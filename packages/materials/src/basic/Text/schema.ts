@@ -22,97 +22,6 @@ export const textProps: Record<string, PropSchema> = {
       { label: 'div', value: 'div' },
     ],
   },
-  fontSize: {
-    type: 'string',
-    label: '字体大小',
-    default: '14px',
-  },
-  color: {
-    type: 'string',
-    label: '字体颜色',
-    default: '#333333',
-  },
-  fontWeight: {
-    type: 'select',
-    label: '字体粗细',
-    default: 'normal',
-    options: [
-      { label: '正常', value: 'normal' },
-      { label: '粗体', value: 'bold' },
-      { label: '更粗', value: 'bolder' },
-      { label: '100', value: '100' },
-      { label: '200', value: '200' },
-      { label: '300', value: '300' },
-      { label: '400', value: '400' },
-      { label: '500', value: '500' },
-      { label: '600', value: '600' },
-      { label: '700', value: '700' },
-      { label: '800', value: '800' },
-      { label: '900', value: '900' },
-    ],
-  },
-  textAlign: {
-    type: 'select',
-    label: '对齐方式',
-    default: 'left',
-    options: [
-      { label: '左对齐', value: 'left' },
-      { label: '居中', value: 'center' },
-      { label: '右对齐', value: 'right' },
-      { label: '两端对齐', value: 'justify' },
-    ],
-  },
-  lineHeight: {
-    type: 'string',
-    label: '行高',
-    default: '1.5',
-  },
-  letterSpacing: {
-    type: 'string',
-    label: '字间距',
-    default: 'normal',
-  },
-  textDecoration: {
-    type: 'select',
-    label: '文本装饰',
-    default: 'none',
-    options: [
-      { label: '无', value: 'none' },
-      { label: '下划线', value: 'underline' },
-      { label: '删除线', value: 'line-through' },
-      { label: '上划线', value: 'overline' },
-    ],
-  },
-  whiteSpace: {
-    type: 'select',
-    label: '空白处理',
-    default: 'normal',
-    options: [
-      { label: '正常', value: 'normal' },
-      { label: '不换行', value: 'nowrap' },
-      { label: '保留空白', value: 'pre' },
-      { label: '保留换行', value: 'pre-wrap' },
-    ],
-  },
-  fontFamily: {
-    type: 'select',
-    label: '字体系列',
-    default: 'inherit',
-    options: [
-      { label: '继承', value: 'inherit' },
-      { label: '宋体', value: 'SimSun' },
-      { label: '黑体', value: 'SimHei' },
-      { label: '微软雅黑', value: 'Microsoft YaHei' },
-      { label: 'Arial', value: 'Arial' },
-      { label: 'Times New Roman', value: 'Times New Roman' },
-      { label: 'Courier New', value: 'Courier New' },
-    ],
-  },
-  italic: {
-    type: 'boolean',
-    label: '斜体',
-    default: false,
-  },
 }
 
 export const TextDefinition: ComponentDefinition = {
@@ -123,18 +32,10 @@ export const TextDefinition: ComponentDefinition = {
   defaultProps: {
     content: '文本内容',
     tag: 'p',
-    fontSize: '14px',
-    color: '#333333',
-    fontWeight: 'normal',
-    textAlign: 'left',
-    lineHeight: '1.5',
-    letterSpacing: 'normal',
-    textDecoration: 'none',
-    whiteSpace: 'normal',
-    fontFamily: 'inherit',
-    italic: false,
   },
   defaultStyles: {
     display: 'inline-block',
+    'font-size': '14px',
+    color: '#333333',
   },
 }
